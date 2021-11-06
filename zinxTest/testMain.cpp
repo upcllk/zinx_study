@@ -4,6 +4,40 @@
 using namespace std;
 
 /* Echo */
+
+/*创建标准输出通道类*/
+class TestStdout :public Ichannel {
+	// 通过 Ichannel 继承
+	virtual bool Init() override
+	{
+		return true;
+	}
+	virtual bool ReadFd(std::string& _input) override
+	{
+		return false;
+	}
+	virtual bool WriteFd(std::string& _output) override
+	{
+		cout << _output << endl;
+		return true;
+	}
+	virtual void Fini() override
+	{
+	}
+	virtual int GetFd() override
+	{
+		return STDOUT_FILENO;
+	}
+	virtual std::string GetChannelInfo() override
+	{
+		return "stdout";
+	}
+	virtual AZinxHandler* GetInputNextStage(BytesMsg& _oInput) override
+	{
+		return nullptr;
+	}
+}*poStdout = new TestStdout();
+
 /*2、写功能处理类*/
 class Echo :public AZinxHandler {
 	// 通过 AZinxHandler 继承
@@ -12,7 +46,7 @@ class Echo :public AZinxHandler {
 		// 信息处理函数， 实现 Echo 功能
 		// 定义一个 ByteMsg 类型的 input 指向 _oInput ? 
 		GET_REF2DATA(BytesMsg, input, _oInput);
-		cout << input.szData << endl;
+		ZinxKernel::Zinx_SendOut(input.szData, *poStdout);
 		return nullptr;
 	}
 	virtual AZinxHandler* GetNextHandler(IZinxMsg& _oNextMsg) override
@@ -62,6 +96,7 @@ int main() {
 	/*4、将通道对象添加到框架*/
 	TestStdin* poStdin = new TestStdin();
 	ZinxKernel::Zinx_Add_Channel(*poStdin);
+	ZinxKernel::Zinx_Add_Channel(*poStdout);
 
 	ZinxKernel::Zinx_Run();
 	ZinxKernel::ZinxKernelFini();
