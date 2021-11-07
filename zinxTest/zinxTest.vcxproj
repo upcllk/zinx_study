@@ -78,7 +78,17 @@
     <IncludePath>D:\filesForCpp\zinx\zinx-master</IncludePath>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="CmdMsg.cpp" />
+    <ClCompile Include="CmdVerify.cpp" />
+    <ClCompile Include="Role.cpp" />
+    <ClCompile Include="StdInOutChannel.cpp" />
     <ClCompile Include="testMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CmdMsg.h" />
+    <ClInclude Include="CmdVerify.h" />
+    <ClInclude Include="Role.h" />
+    <ClInclude Include="StdInOutChannel.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
