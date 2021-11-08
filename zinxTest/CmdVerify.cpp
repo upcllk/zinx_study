@@ -51,6 +51,7 @@ std::string* CmdVerify::response2raw(UserData& _oUserData)
     return new std::string(output.szUserData);
 }
 
+// 这个咋来的
 Irole* CmdVerify::GetMsgProcessor(UserDataMsg& _oUserDataMsg)
 {
     // 数据来源 cin 或者 tcp  

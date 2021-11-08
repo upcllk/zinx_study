@@ -34,7 +34,7 @@ bool OutputCtrl::Init()
 		}
 	}
 	if (pRetRole != nullptr) {
-		SetNextProcessor(*pRetRole);
+		OutputCtrl::SetNextProcessor(*pRetRole);
 	}
 	return true;
 }
@@ -80,7 +80,7 @@ bool DatePreRole::Init()
 		}
 	}
 	if (pRetRole != nullptr) {
-		SetNextProcessor(*pRetRole);
+		DatePreRole::SetNextProcessor(*pRetRole);
 	}
 	return true;
 }

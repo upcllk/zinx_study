@@ -83,6 +83,7 @@
     <ClCompile Include="Role.cpp" />
     <ClCompile Include="StdInOutChannel.cpp" />
     <ClCompile Include="testMain.cpp" />
+    <ClCompile Include="TimerTask.cpp" />
     <ClCompile Include="ZinxTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +91,7 @@
     <ClInclude Include="CmdVerify.h" />
     <ClInclude Include="Role.h" />
     <ClInclude Include="StdInOutChannel.h" />
+    <ClInclude Include="TimerTask.h" />
     <ClInclude Include="ZinxTimer.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -4,6 +4,7 @@
 #include "Role.h"
 #include <ZinxTCP.h>
 #include "ZinxTimer.h"
+#include "TimerTask.h"
 
 using namespace std;
 
@@ -188,46 +189,15 @@ class TestStdin :
 */
 
 
-// 每三秒打印 hello world
-class TimerHello :
-	public TimerOutProc
-{
-	// 通过 TimerOutProc 继承
-	virtual void Proc() override
-	{
-		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
-		std::string output = "hello world";
-		ZinxKernel::Zinx_SendOut(output, *pChannel);
-	}
-	virtual int GetTimeSec() override
-	{
-		return 3;
-	}
-};
-
-// 每五秒打印 bye bye
-class TimerBye :
-	public TimerOutProc
-{
-	// 通过 TimerOutProc 继承
-	virtual void Proc() override
-	{
-		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
-		std::string output = "bye bye";
-		ZinxKernel::Zinx_SendOut(output, *pChannel);
-	}
-	virtual int GetTimeSec() override
-	{
-		return 5;
-	}
-};
 
 int main() {
 	// 1、初始化框架
 	ZinxKernel::ZinxKernelInit();
 
-	TimeOutMng::GetInstance()->AddTask(new TimerHello());
-	TimeOutMng::GetInstance()->AddTask(new TimerBye());
+	// 每三秒打印 hello world
+	TimeOutMng::GetInstance()->AddTask(new TimerHello(3));
+	// 每五秒打印 bye bye
+	TimeOutMng::GetInstance()->AddTask(new TimerBye(5));
 
 	// 4、将通道对象添加到框架
 	// 顺序影响吗  好像会影响

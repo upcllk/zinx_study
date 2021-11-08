@@ -109,7 +109,7 @@ IZinxMsg* TimeOutMng::InternelHandle(IZinxMsg& _oInput)
                 m_cache.push_back(*ite);
                 auto tmp = *ite;
                 ite = m_timer_whell[m_cur_index].erase(ite);
-                AddTask(tmp);
+                TimeOutMng::AddTask(tmp);
             }
             else {
                 --(*ite)->iCount;
