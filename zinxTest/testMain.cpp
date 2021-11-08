@@ -3,6 +3,7 @@
 #include "StdInOutChannel.h"
 #include "Role.h"
 #include <ZinxTCP.h>
+#include "ZinxTimer.h"
 
 using namespace std;
 
@@ -13,7 +14,8 @@ Echo
 	输入 date 打开日期前缀功能	cleardate 关闭
 */
 
-/*创建标准输出通道类*/
+/*
+// 创建标准输出通道类
 class TestStdout :public Ichannel {
 	// 通过 Ichannel 继承
 	virtual bool Init() override
@@ -46,17 +48,17 @@ class TestStdout :public Ichannel {
 	}
 }*poStdout = new TestStdout();
 
-/*2、写功能处理类*/
-class Echo :public AZinxHandler {
+// 2、写功能处理类
+class Echo :
+	public AZinxHandler {
 	// 通过 AZinxHandler 继承
 	virtual IZinxMsg* InternelHandle(IZinxMsg& _oInput) override
 	{
 		// 信息处理函数， 实现 Echo 功能
 		GET_REF2DATA(BytesMsg, input, _oInput);
 
-		/*判断是否退出, 但是如果在这里直接 zinx_exit 退出会违反开闭原则， 不利于添加新功能
-			--> 创建退出程序类先过滤
-		*/
+		// 判断是否退出, 但是如果在这里直接 zinx_exit 退出会违反开闭原则， 不利于添加新功能
+		//	--> 创建退出程序类先过滤
 		ZinxKernel::Zinx_SendOut(input.szData, *poStdout);
 		return nullptr;
 	}
@@ -75,7 +77,7 @@ class ExitFramework :public AZinxHandler {
 			ZinxKernel::Zinx_Exit();
 			return nullptr;
 		}
-		/*创建交给下一个处理环节的数据*/
+		// 创建交给下一个处理环节的数据
 		return new BytesMsg(oByte);
 	}
 	virtual AZinxHandler* GetNextHandler(IZinxMsg& _oNextMsg) override
@@ -84,7 +86,8 @@ class ExitFramework :public AZinxHandler {
 	}
 }*poExit = new ExitFramework();
 
-class AddDate :public AZinxHandler {
+class AddDate :
+	public AZinxHandler {
 	// 通过 AZinxHandler 继承
 	virtual IZinxMsg* InternelHandle(IZinxMsg& _oInput) override
 	{
@@ -103,12 +106,13 @@ class AddDate :public AZinxHandler {
 	}
 }*poAddDate = new AddDate();
 
-class CmdHandler :public AZinxHandler {
+class CmdHandler :
+	public AZinxHandler {
 	// 通过 AZinxHandler 继承
 	int status = 0;	// 0 - 不加前缀， 1 - 加前缀
 	virtual IZinxMsg* InternelHandle(IZinxMsg& _oInput) override
 	{
-		/*判断输入是否是 open 或者 close*/
+		// 判断输入是否是 open 或者 close
 		GET_REF2DATA(BytesMsg, oBytes, _oInput);
 		if (oBytes.szData == "open") {
 			ZinxKernel::Zinx_Add_Channel(*poStdout);
@@ -129,7 +133,7 @@ class CmdHandler :public AZinxHandler {
 	}
 	virtual AZinxHandler* GetNextHandler(IZinxMsg& _oNextMsg) override
 	{
-		/*根据不同消息选择不同处理者*/
+		// 根据不同消息选择不同处理者
 		GET_REF2DATA(BytesMsg, oBytes, _oNextMsg);
 		if (oBytes.szData == "exit") {
 			return poExit;
@@ -148,8 +152,9 @@ class CmdHandler :public AZinxHandler {
 	}
 }*poCmd = new CmdHandler();
 
-/*3、写通道类*/
-class TestStdin : public Ichannel {
+// 3、写通道类
+class TestStdin :
+	public Ichannel {
 	// 通过 Ichannel 继承
 	virtual bool Init() override
 	{
@@ -161,7 +166,7 @@ class TestStdin : public Ichannel {
 		return true;
 	}
 	virtual bool WriteFd(std::string& _output) override
-	{ 
+	{
 		return false;
 	}
 	virtual void Fini() override
@@ -180,14 +185,52 @@ class TestStdin : public Ichannel {
 		return poCmd;
 	}
 };
+*/
 
+
+// 每三秒打印 hello world
+class TimerHello :
+	public TimerOutProc
+{
+	// 通过 TimerOutProc 继承
+	virtual void Proc() override
+	{
+		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
+		std::string output = "hello world";
+		ZinxKernel::Zinx_SendOut(output, *pChannel);
+	}
+	virtual int GetTimeSec() override
+	{
+		return 3;
+	}
+};
+
+// 每五秒打印 bye bye
+class TimerBye :
+	public TimerOutProc
+{
+	// 通过 TimerOutProc 继承
+	virtual void Proc() override
+	{
+		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
+		std::string output = "bye bye";
+		ZinxKernel::Zinx_SendOut(output, *pChannel);
+	}
+	virtual int GetTimeSec() override
+	{
+		return 5;
+	}
+};
 
 int main() {
-	/*1、初始化框架*/
+	// 1、初始化框架
 	ZinxKernel::ZinxKernelInit();
 
-	/*4、将通道对象添加到框架*/
-	/*顺序影响吗  好像会影响*/
+	TimeOutMng::GetInstance()->AddTask(new TimerHello());
+	TimeOutMng::GetInstance()->AddTask(new TimerBye());
+
+	// 4、将通道对象添加到框架
+	// 顺序影响吗  好像会影响
 	ZinxKernel::Zinx_Add_Channel(*(new StdInChannel()));
 	ZinxKernel::Zinx_Add_Channel(*(new StdOutChannel()));
 	// 创建 TCP 监听类加入到 Kernel	指定端口号和工厂对象
@@ -195,6 +238,7 @@ int main() {
 	ZinxKernel::Zinx_Add_Role(*(new EchoRole()));
 	ZinxKernel::Zinx_Add_Role(*(new DatePreRole()));
 	ZinxKernel::Zinx_Add_Role(*(new OutputCtrl()));
+	ZinxKernel::Zinx_Add_Channel(*(new ZinxTimerChannel()));
 	/*
 	TestStdin* poStdin = new TestStdin();
 	ZinxKernel::Zinx_Add_Channel(*poStdin);
