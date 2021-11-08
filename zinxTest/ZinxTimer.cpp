@@ -1,8 +1,8 @@
-#include "ZinxTimer.h"
+ï»¿#include "ZinxTimer.h"
 #include <sys/timerfd.h>
 #include <unistd.h>
 
-// ´´½¨¶¨Ê±Æ÷ÎÄ¼şÃèÊö·û, ³É¹¦ true Ê§°Ü false
+// åˆ›å»ºå®šæ—¶å™¨æ–‡ä»¶æè¿°ç¬¦, æˆåŠŸ true å¤±è´¥ false
 bool ZinxTimerChannel::Init()
 {
     int bRet = false;
@@ -19,7 +19,7 @@ bool ZinxTimerChannel::Init()
     return bRet;
 }
 
-// ¶ÁÈ¡³¬Ê±´ÎÊı£¬ Ò»°ã¾ÍÊÇ 1 
+// è¯»å–è¶…æ—¶æ¬¡æ•°ï¼Œ ä¸€èˆ¬å°±æ˜¯ 1 
 bool ZinxTimerChannel::ReadFd(std::string& _input)
 {
     bool bRet = false;
@@ -36,7 +36,7 @@ bool ZinxTimerChannel::WriteFd(std::string& _output)
     return false;
 }
 
-// ¹Ø±ÕÎÄ¼şÃèÊö·û
+// å…³é—­æ–‡ä»¶æè¿°ç¬¦
 void ZinxTimerChannel::Fini()
 {
 
@@ -44,7 +44,7 @@ void ZinxTimerChannel::Fini()
     m_Timerfd = -1;
 }
 
-// ·µ»Øµ±Ç°µÄ¶¨Ê±Æ÷ fd
+// è¿”å›å½“å‰çš„å®šæ—¶å™¨ fd
 int ZinxTimerChannel::GetFd()
 {
     return m_Timerfd;
@@ -55,7 +55,7 @@ std::string ZinxTimerChannel::GetChannelInfo()
     return "timerFd";
 }
 
-// ·µ»Ø´¦Àí³¬Ê±Ê±¼äµÄ¶ÔÏó
+// è¿”å›å¤„ç†è¶…æ—¶æ—¶é—´çš„å¯¹è±¡
 AZinxHandler* ZinxTimerChannel::GetInputNextStage(BytesMsg& _oInput)
 {
     // output_hello* pout_hello = new output_hello();
@@ -65,7 +65,7 @@ AZinxHandler* ZinxTimerChannel::GetInputNextStage(BytesMsg& _oInput)
 
 IZinxMsg* output_hello::InternelHandle(IZinxMsg& _oInput)
 {
-    // »ñÈ¡Êä³öÍ¨µÀ
+    // è·å–è¾“å‡ºé€šé“
     auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
     std::string output = "hello world";
     ZinxKernel::Zinx_SendOut(output, *pChannel);
@@ -78,7 +78,7 @@ AZinxHandler* output_hello::GetNextHandler(IZinxMsg& _oNextMsg)
 }
 
 TimeOutMng::TimeOutMng() {
-    // ´´½¨ 10 ¸ö³İ
+    // åˆ›å»º 10 ä¸ªé½¿
     for (int i = 0; i < WHELLSIZE; ++i) {
         std::list<TimerOutProc*> tmp;
         m_timer_whell.push_back(tmp);
@@ -89,22 +89,22 @@ TimeOutMng* TimeOutMng::single = new TimeOutMng();
 
 IZinxMsg* TimeOutMng::InternelHandle(IZinxMsg& _oInput)
 {
-    // ³¬Ê±¶àÉÙ´Î ·ÀÖ¹ÒòÎª×èÈûÔì³ÉµÄ¶à´Î³¬Ê±
+    // è¶…æ—¶å¤šå°‘æ¬¡ é˜²æ­¢å› ä¸ºé˜»å¡é€ æˆçš„å¤šæ¬¡è¶…æ—¶
     uint64_t iTimeOutCount = 0;
     GET_REF2DATA(BytesMsg, oBytes, _oInput);
     oBytes.szData.copy((char*)&iTimeOutCount, sizeof(iTimeOutCount), 0);
 
     while (iTimeOutCount-- > 0) {
-        // ÒÆ¶¯¿Ì¶È
-        // µ±Ç°¿Ì¶È½ÚµãÈ¦Êı -1 »ò Ö´ĞĞ³¬Ê±º¯Êı
+        // ç§»åŠ¨åˆ»åº¦
+        // å½“å‰åˆ»åº¦èŠ‚ç‚¹åœˆæ•° -1 æˆ– æ‰§è¡Œè¶…æ—¶å‡½æ•°
         m_cur_index = (m_cur_index + 1) % WHELLSIZE;
         std::list<TimerOutProc*> m_cache;
         for (auto ite = m_timer_whell[m_cur_index].begin();
             ite != m_timer_whell[m_cur_index].end(); ) {
             if ((*ite)->iCount <= 0) {
-                // ´æÔÚ°²È«Òş»¼- 
+                // å­˜åœ¨å®‰å…¨éšæ‚£-  
                 // Proc() : TimeOutMng::GetInstance()->DelTask(this);
-                // ¿ÉÒÔ¸ù¾İ»º´æµÄË¼Â·£¬°ÑÒªÖ´ĞĞ³¬Ê±º¯ÊıµÄ task ´æµ½Ò»¸öÁÙÊ±ÈİÆ÷£¬ for Ñ­»·ºóÍ³Ò»´¦Àí
+                // å¯ä»¥æ ¹æ®ç¼“å­˜çš„æ€è·¯ï¼ŒæŠŠè¦æ‰§è¡Œè¶…æ—¶å‡½æ•°çš„ task å­˜åˆ°ä¸€ä¸ªä¸´æ—¶å®¹å™¨ï¼Œ for å¾ªç¯åç»Ÿä¸€å¤„ç†
                 // (*ite)->Proc();
                 m_cache.push_back(*ite);
                 auto tmp = *ite;
@@ -117,7 +117,7 @@ IZinxMsg* TimeOutMng::InternelHandle(IZinxMsg& _oInput)
             }
         }
 
-        // Í³Ò»´¦Àí³¬Ê±ÈÎÎñ
+        // ç»Ÿä¸€å¤„ç†è¶…æ—¶ä»»åŠ¡
         for (auto task : m_cache) {
             task->Proc();
         }
@@ -133,7 +133,7 @@ AZinxHandler* TimeOutMng::GetNextHandler(IZinxMsg& _oNextMsg)
 
 void TimeOutMng::AddTask(TimerOutProc* _ptask)
 {
-    // ¼ÆËãµ±Ç°ÈÎÎñÉèÖÃµ½ÄÄ¸ö³İÉÏ ÒÔ¼° ËùĞèÈ¦Êı
+    // è®¡ç®—å½“å‰ä»»åŠ¡è®¾ç½®åˆ°å“ªä¸ªé½¿ä¸Š ä»¥åŠ æ‰€éœ€åœˆæ•°
     int index = (_ptask->GetTimeSec() + m_cur_index) % WHELLSIZE;
     _ptask->iCount = _ptask->GetTimeSec() / WHELLSIZE;
     m_timer_whell[index].push_back(_ptask);
@@ -144,8 +144,8 @@ void TimeOutMng::AddTask(TimerOutProc* _ptask)
 
 void TimeOutMng::DelTask(TimerOutProc* _ptask)
 {
-    // ±éÀúÊ±¼äÂÖÉ¾³ıÈÎÎñ
-    // Ä¬ÈÏ¿½±´¼ÇµÃ &
+    // éå†æ—¶é—´è½®åˆ é™¤ä»»åŠ¡
+    // é»˜è®¤æ‹·è´è®°å¾— &
     // auto& -> list<TimerOutProc*>&
     for (auto& gear : m_timer_whell) {
         for (auto task : gear) {
