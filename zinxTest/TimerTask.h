@@ -1,4 +1,4 @@
-#include <zinx.h>
+ï»¿#include <zinx.h>
 #include "ZinxTimer.h"
 
 class TimerHello :
@@ -8,7 +8,7 @@ public:
 	TimerHello(int _freqSenconds);
 private:
 	int m_freqSeconds;
-	// Í¨¹ý TimerOutProc ¼Ì³Ð
+	// é€šè¿‡ TimerOutProc ç»§æ‰¿
 	virtual void Proc() override
 	{
 		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
@@ -28,8 +28,8 @@ public:
 	TimerBye(int _freqSenconds);
 private:
 	int m_freqSeconds;
-	// Í¨¹ý TimerOutProc ¼Ì³Ð
-	virtual void Proc() override
+	// é€šè¿‡ TimerOutProc ç»§æ‰¿
+	virtual void Proc() override   
 	{
 		auto pChannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
 		std::string output = "bye bye";
